@@ -1,203 +1,307 @@
-# Agendo - De chat a cita en segundos
+# Awendo - Conversational WhatsApp Agent
 
-Una aplicación MVP web-first para convertir conversaciones de WhatsApp en citas automáticamente, usando Twilio WhatsApp Business API.
+A modern, intelligent WhatsApp conversational agent that automatically handles customer interactions and books appointments through Google Calendar integration.
 
-## 🚀 Características
+## 🏗️ Architecture
 
-- **Landing Page**: Página principal con branding Agendo y CTAs para pruebas rápidas
-- **WhatsApp Integration**: Webhook que responde automáticamente a mensajes
-- **Test Dashboard**: Interfaz para enviar mensajes de prueba
-- **Twilio Sandbox**: Integración completa con Twilio WhatsApp sandbox
+```
+┌─────────────────────┐    ┌──────────────────────┐    ┌─────────────────────┐
+│   Frontend Web      │    │   Backend Python     │    │   Evolution API     │
+│   (Next.js/TS)      │    │   (FastAPI+LangGraph)│    │   (WhatsApp)        │
+├─────────────────────┤    ├──────────────────────┤    ├─────────────────────┤
+│ • Landing Page      │    │ • Agent Logic        │    │ • WhatsApp Gateway  │
+│ • Setup Wizard      │    │ • LangGraph Workflow │    │ • Message Routing   │
+│ • Config Interface  │    │ • Context Management │    │ • QR Code Gen       │
+│ • Google Calendar   │    │ • Calendar Booking   │    │                     │
+│                     │    │ • Conversation State │    │                     │
+└─────────────────────┘    └──────────────────────┘    └─────────────────────┘
+         │                           │                           │
+         └───── HTTP API ────────────┼──── Webhooks ─────────────┘
+                                     │
+                              ┌──────────────┐
+                              │ Supabase     │
+                              │ (PostgreSQL) │
+                              │ • Configs    │
+                              │ • Chats      │
+                              │ • Users      │
+                              └──────────────┘
+```
 
-## 📋 Requisitos Previos
+## 🚀 Features
 
-- Node.js 18+ 
-- Cuenta de Twilio con WhatsApp Sandbox configurado
-- npm o yarn
+- **🏠 Modern Web Interface**: Clean setup wizard and configuration interface
+- **📱 WhatsApp Integration**: Direct connection via Evolution API (no Meta dependency)
+- **🤖 Intelligent Agent**: LangGraph-powered conversational AI with context awareness
+- **📅 Calendar Integration**: Automatic appointment booking with Google Calendar
+- **💾 Persistent Storage**: Supabase PostgreSQL for reliable data management
+- **🕒 Business Hours**: Respects configured working hours
+- **🔄 Real-time Processing**: Instant message processing and responses
+- **📊 Conversation Tracking**: Full conversation history and analytics
 
-## ⚙️ Configuración
+## 📋 Prerequisites
 
-### 1. Clonar e instalar dependencias
+- **Python 3.9+** (for backend)
+- **Node.js 18+** (for frontend)
+- **Evolution API instance** (WhatsApp integration)
+- **Supabase project** (database)
+- **Google Cloud Project** (Calendar API)
+- **OpenAI API key** (for conversational AI)
+
+## ⚙️ Setup Instructions
+
+### 1. Clone and Install Dependencies
 
 ```bash
-git clone <tu-repo>
+git clone <your-repo>
 cd agendo
+
+# Install backend dependencies
+cd backend
+pip install -r requirements.txt
+
+# Install frontend dependencies
+cd ../frontend
 npm install
 ```
 
-### 2. Configurar variables de entorno
-
-Crea un archivo `.env.local` en la raíz del proyecto:
-
-```env
-TWILIO_ACCOUNT_SID=your_account_sid_here
-TWILIO_AUTH_TOKEN=your_auth_token_here
-TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
-TWILIO_SANDBOX_NUMBER=14155238886
-TWILIO_SANDBOX_CODE=your_sandbox_code
-PUBLIC_WEBHOOK_URL=https://tu-dominio.vercel.app/api/whatsapp/webhook
-```
-
-### 3. Configurar Twilio WhatsApp Sandbox
-
-1. Ve a la [Consola de Twilio](https://console.twilio.com/)
-2. Navega a **Messaging > Try it out > Send a WhatsApp message**
-3. Sigue las instrucciones para unirte al sandbox
-4. Obtén tus credenciales y código del sandbox
-
-### 4. Ejecutar en desarrollo
+### 2. Configure Backend Environment
 
 ```bash
+cd backend
+cp .env.example .env
+```
+
+Edit `.env` with your configuration:
+
+```env
+# Database (Supabase)
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+
+# Evolution API (WhatsApp)
+EVOLUTION_API_URL=https://your-evolution-api-url.com
+EVOLUTION_API_KEY=your-evolution-api-key
+
+# Google Calendar
+GOOGLE_CLIENT_ID=your-google-client-id.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+# OpenAI (for conversational AI)
+OPENAI_API_KEY=sk-your-openai-api-key
+```
+
+### 3. Configure Frontend Environment
+
+```bash
+cd frontend
+cp .env.example .env.local
+```
+
+Edit `.env.local`:
+
+```env
+# Backend API URL
+NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
+
+# Google Calendar (same as backend)
+GOOGLE_CLIENT_ID=your-google-client-id.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+### 4. Set Up External Services
+
+#### Supabase Database
+1. Create a [Supabase project](https://supabase.com)
+2. Get your project URL and service role key
+3. The backend will automatically create tables on first run
+
+#### Evolution API
+1. Deploy an [Evolution API](https://github.com/EvolutionAPI/evolution-api) instance
+2. Configure webhook URL: `http://your-backend-url/api/v1/webhooks/evolution`
+3. Get your API URL and key
+
+#### Google Calendar API
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create/select a project and enable Calendar API
+3. Create OAuth 2.0 credentials:
+   - Type: Web Application
+   - Authorized redirect URIs: `http://localhost:8000/api/v1/auth/google/callback`
+
+#### OpenAI API
+1. Get your API key from [OpenAI Platform](https://platform.openai.com/)
+2. Ensure you have credits/billing set up
+
+### 5. Run the Application
+
+Start both backend and frontend in separate terminals:
+
+```bash
+# Terminal 1: Backend
+cd backend
+python run_dev.py
+
+# Terminal 2: Frontend
+cd frontend
 npm run dev
 ```
 
-Abre [http://localhost:3000](http://localhost:3000) para ver la aplicación.
+The application will be available at:
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8000
+- **API Docs**: http://localhost:8000/docs
 
-## 🌐 Deploy en Vercel
+## 🧪 How to Use
 
-### 1. Deploy automático
+### Complete Setup Flow (3 minutes)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/tu-usuario/agendo)
+1. **Open the frontend**: Go to http://localhost:3000
+2. **Connect WhatsApp**: Click "Conectar tu número" → Scan QR code
+3. **Connect Google Calendar**: Authorize your Google account
+4. **Configure your agent**:
+   - Agent name and personality
+   - Business description
+   - Working hours
+5. **Activate your agent**: Save configuration
 
-### 2. Deploy manual
+### Test the Conversational Agent
 
-```bash
-npm install -g vercel
-vercel
+Once configured, customers can message your WhatsApp and the agent will:
+
+- **Greet customers** with personalized messages
+- **Answer business questions** based on your configuration
+- **Schedule appointments** automatically in Google Calendar
+- **Check availability** in real-time
+- **Respect business hours** and send appropriate out-of-hours messages
+
+#### Example Conversation:
+
 ```
+Customer: "Hi, I want to schedule an appointment"
+Agent: "Hello! I'm Sofia from [Your Business]. I'd be happy to help you schedule an appointment. What date and time work best for you? Please use DD/MM/YYYY and HH:MM format."
 
-### 3. Configurar variables de entorno en Vercel
+Customer: "Tomorrow at 2:00 PM"
+Agent: "Perfect! I have availability tomorrow at 2:00 PM. Could you please confirm your full name for the appointment?"
 
-En tu dashboard de Vercel, ve a Settings > Environment Variables y agrega:
-
-- `TWILIO_ACCOUNT_SID`
-- `TWILIO_AUTH_TOKEN` 
-- `TWILIO_WHATSAPP_FROM`
-- `TWILIO_SANDBOX_NUMBER`
-- `TWILIO_SANDBOX_CODE`
-- `PUBLIC_WEBHOOK_URL` (tu dominio de Vercel + `/api/whatsapp/webhook`)
-
-### 4. Configurar webhook en Twilio
-
-En la consola de Twilio, configura el webhook URL:
+Customer: "John Smith"
+Agent: "✅ Appointment confirmed for John Smith tomorrow at 2:00 PM. You'll receive a calendar invitation shortly. See you then!"
 ```
-https://tu-dominio.vercel.app/api/whatsapp/webhook
-```
-
-## 🧪 Pruebas
-
-### Probar el webhook (30 segundos)
-
-1. Ve a tu aplicación desplegada
-2. Haz clic en **"Probar ya"**
-3. Se abrirá WhatsApp con el mensaje pre-escrito `join <código>`
-4. Envía el mensaje
-5. Deberías recibir "Recibido ✅" como respuesta
-
-### Probar envío de mensajes
-
-1. Ve a `/dashboard` en tu aplicación
-2. Ingresa tu número de WhatsApp (con código de país)
-3. Escribe un mensaje de prueba
-4. Haz clic en **"Enviar Prueba"**
-5. Deberías recibir el mensaje en WhatsApp
 
 ## 📡 API Endpoints
 
-### Webhook de WhatsApp
-```
-POST /api/whatsapp/webhook
-Content-Type: application/x-www-form-urlencoded
-```
+### Webhook Endpoints
+- `POST /api/v1/webhooks/evolution` - Evolution API webhook
+- `GET /api/v1/webhooks/evolution/test` - Test webhook connectivity
 
-Recibe webhooks de Twilio y responde automáticamente con "Recibido ✅".
+### Health & Status
+- `GET /` - Root endpoint
+- `GET /health` - Health check
+- `GET /api/v1/status` - Detailed API status
 
-### Enviar Mensaje
-```
-POST /api/whatsapp/send
-Content-Type: application/json
+## 🛠️ Development
 
-{
-  "to": "+1234567890",
-  "body": "Tu mensaje aquí"
-}
-```
+### Backend Development
 
-### Ejemplos con cURL
-
-#### Enviar mensaje de prueba:
 ```bash
-curl -X POST https://tu-dominio.vercel.app/api/whatsapp/send \
-  -H "Content-Type: application/json" \
-  -d '{
-    "to": "+1234567890",
-    "body": "Mensaje de prueba desde cURL"
-  }'
+cd backend
+
+# Run with auto-reload
+python run_dev.py
+
+# Run tests (when implemented)
+pytest
+
+# Code formatting
+black app/
+flake8 app/
 ```
 
-#### Probar webhook (simulación):
+### Frontend Development
+
 ```bash
-curl -X POST https://tu-dominio.vercel.app/api/whatsapp/webhook \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "From=whatsapp%3A%2B1234567890&Body=Hola&MessageSid=test123"
+cd frontend
+
+# Development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Linting
+npm run lint
 ```
 
-## 🏗️ Estructura del Proyecto
+## 📊 Database Schema
 
-```
-src/
-├── app/
-│   ├── api/
-│   │   └── whatsapp/
-│   │       ├── webhook/route.ts    # Webhook para recibir mensajes
-│   │       └── send/route.ts       # API para enviar mensajes
-│   ├── connect/page.tsx            # Página placeholder para conectar número
-│   ├── dashboard/page.tsx          # Dashboard de pruebas
-│   ├── layout.tsx                  # Layout principal
-│   └── page.tsx                    # Landing page
-```
+The application uses the following main tables:
 
-## 🔍 Logging y Debug
+- **instances**: WhatsApp instances and connection status
+- **agent_configs**: Agent configuration and behavior settings
+- **conversations**: Customer conversation threads
+- **messages**: Individual messages within conversations
+- **calendar_events**: Booked appointments and calendar events
 
-Los logs incluyen un `requestId` único para rastrear cada operación:
+## 🔧 Configuration
 
-```
-[abc123] Webhook received
-[abc123] Body: From=whatsapp%3A%2B1234567890&Body=test
-[abc123] Echo reply sent. Message SID: SMxxxxx
-```
+### Agent Behavior
 
-## ✅ Acceptance Criteria
+The conversational agent can be configured with:
 
-- ✅ Enviar "join \<code\>" al Sandbox → webhook registra y responde "Recibido ✅"
-- ✅ Desde `/dashboard`, enviar mensaje de prueba con 200 OK
-- ✅ README con setup, env y curl de prueba
-- ✅ 200 OK inmediato en webhook
-- ✅ Logging básico con request_id
+- **Agent Name**: How the agent introduces itself
+- **Business Purpose**: What your business does
+- **Agent Behavior**: Personality and response style
+- **Working Hours**: When the agent should be active
+- **Google Calendar**: For automatic appointment booking
 
-## 🛠️ Stack Tecnológico
+### LangGraph Workflow
 
-- **Frontend**: Next.js 14 (App Router) + TypeScript + Tailwind CSS
-- **Backend**: Next.js API Routes
-- **WhatsApp**: Twilio WhatsApp Business API
-- **Deploy**: Vercel
-- **Styling**: Tailwind CSS with dark mode support
+The agent uses a sophisticated workflow:
 
-## 📝 Notas de Desarrollo
+1. **Working Hours Check**: Ensures responses during business hours
+2. **Intent Detection**: Understands customer intent (greeting, booking, info)
+3. **Context Management**: Maintains conversation context
+4. **Response Generation**: Creates appropriate responses
+5. **Action Execution**: Books appointments when needed
 
-- El webhook responde 200 OK inmediatamente y procesa el mensaje de forma asíncrona
-- Validación de firma de Twilio para seguridad
-- Interfaz responsive con soporte para modo oscuro
-- Manejo de errores robusto con logging detallado
+## 🚀 Deployment
 
-## 🤝 Contribuir
+### Backend Deployment
 
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
+The backend can be deployed to any Python hosting service:
 
-## 📄 Licencia
+- **Railway/Render**: Easy deployment with git integration
+- **Docker**: Use the provided Dockerfile (when created)
+- **VPS**: Direct deployment with systemd service
 
-Este proyecto está bajo la licencia MIT. Ver `LICENSE` para más detalles.
+### Frontend Deployment
+
+Deploy the Next.js frontend to:
+
+- **Vercel**: Seamless deployment with git integration
+- **Netlify**: Static site deployment
+- **Your own hosting**: Build and serve static files
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🆘 Support
+
+For support and questions:
+
+1. Check the [API documentation](http://localhost:8000/docs) when running locally
+2. Review the logs in both frontend and backend
+3. Ensure all environment variables are properly configured
+4. Verify external service connections (Evolution API, Supabase, Google Calendar)
+
+---
+
+**Built with ❤️ using FastAPI, LangGraph, Next.js, and Supabase**

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Agent Config</title>
+</head>
+<body>
+    <h1>Test Agent Configuration</h1>
+    <button onclick="testConfig()">Test Configuration</button>
+    <div id="result"></div>
+
+    <script>
+        async function testConfig() {
+            const config = {
+                business_name: "Test Business",
+                business_description: "Test description", 
+                available_hours: {
+                    monday: { start: "09:00", end: "17:00" },
+                    tuesday: { start: "09:00", end: "17:00" },
+                    wednesday: { start: "09:00", end: "17:00" },
+                    thursday: { start: "09:00", end: "17:00" },
+                    friday: { start: "09:00", end: "17:00" }
+                },
+                appointment_duration: 60,
+                buffer_time: 15,
+                custom_instructions: "Be helpful and professional",
+                greeting_message: "Hello! How can I help you?"
+            };
+
+            console.log('Sending config:', config);
+
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/agent/config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(config),
+                });
+
+                const result = await response.json();
+                
+                document.getElementById('result').innerHTML = 
+                    `<pre>Status: ${response.status}\n${JSON.stringify(result, null, 2)}</pre>`;
+                
+                console.log('Response:', result);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = 
+                    `<pre style="color: red;">Error: ${error.message}</pre>`;
+            }
+        }
+    </script>
+</body>
+</html>
