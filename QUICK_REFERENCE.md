@@ -50,9 +50,9 @@ curl -X POST http://localhost:8000/api/v1/webhooks/evolution \
 
 ### **Backend no inicia**
 ```bash
-cd backend && source .venv/bin/activate
-pip install -r requirements.txt
-python run_dev.py
+cd backend
+uv sync  # Instala dependencias desde pyproject.toml
+uv run python run_dev.py
 ```
 
 ### **Webhook no actualiza**
