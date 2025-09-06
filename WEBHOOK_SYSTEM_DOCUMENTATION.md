@@ -168,15 +168,21 @@ curl -X POST http://localhost:8000/api/v1/webhooks/update \\
 
 ## 🛠️ Dependencias Agregadas
 
-### **Nuevas dependencias en `requirements.txt`**:
+### **Nuevas dependencias agregadas**:
 ```
 watchdog>=3.0.0  # Para monitoreo de archivos
 ```
 
-**Instalación con uv**:
+**Instalación**:
 ```bash
 cd backend && uv add watchdog
 ```
+
+### **Gestión de Dependencias con UV**:
+- **Agregar**: `uv add paquete`
+- **Instalar**: `uv sync`
+- **Ejecutar**: `uv run python script.py`
+- **Actualizar**: `uv lock --upgrade`
 
 ---
 

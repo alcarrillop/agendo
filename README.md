@@ -55,9 +55,9 @@ A modern, intelligent WhatsApp conversational agent that automatically handles c
 git clone <your-repo>
 cd agendo
 
-# Install backend dependencies
+# Install backend dependencies (usando UV)
 cd backend
-pip install -r requirements.txt
+uv sync
 
 # Install frontend dependencies
 cd ../frontend
@@ -137,9 +137,10 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 Start both backend and frontend in separate terminals:
 
 ```bash
-# Terminal 1: Backend
+# Terminal 1: Backend (usando UV)
 cd backend
-python run_dev.py
+uv sync                    # Instala dependencias (solo primera vez)
+uv run python run_dev.py   # Ejecuta el servidor
 
 # Terminal 2: Frontend
 cd frontend

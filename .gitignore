@@ -90,5 +90,11 @@ temp/
 yarn.lock
 pnpm-lock.yaml
 
+# Python dependency files (using uv only)
+requirements.txt
+requirements-dev.txt
+Pipfile
+Pipfile.lock
+
 # Testing
 .pytest_cache/
